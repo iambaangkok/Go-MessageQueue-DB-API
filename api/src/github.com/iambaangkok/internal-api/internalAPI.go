@@ -1,12 +1,12 @@
-package main
+package internalAPI
 
 import (
+	"config"
 	"context"
 	"database/sql"
 	"fmt"
 	"log"
-	"main/api/config"
-	"main/api/pkg/utils"
+	"utils"
 
 	"github.com/segmentio/kafka-go"
 

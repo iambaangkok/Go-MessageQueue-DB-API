@@ -1,24 +1,21 @@
-package main
+package gatewayAPI
 
 import (
+	"config"
+	"context"
 	"database/sql"
+	"dtos"
+	"fmt"
 	"log"
-	"main/api/config"
-	"main/api/dtos"
-	"main/api/models"
-	"main/api/pkg/utils"
+	"models"
 	"net/http"
+	"utils"
 
-	// "net/http"
-	"github.com/go-martini/martini"
-	"github.com/segmentio/kafka-go"
-
-	// "github.com/martini-contrib/encoder"
 	"encoding/json"
 
-	// "github.com/Rayato159/go-simple-kafka/config"
-
+	"github.com/go-martini/martini"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/segmentio/kafka-go"
 )
 
 var db *sql.DB
@@ -89,7 +86,7 @@ func queryAllMessage(res http.ResponseWriter, req *http.Request, params martini.
 }
 
 
-func insertMessage(res http.ResponseWriter, req *http.Request, params martini.Params) []byte {
+func addMessageKafka(res http.ResponseWriter, req *http.Request, params martini.Params) []byte {
 	decoder := json.NewDecoder(req.Body)
 
 	var dto dtos.MessageInputDTO
@@ -106,7 +103,29 @@ func insertMessage(res http.ResponseWriter, req *http.Request, params martini.Pa
 	}
 	
 
-	return utils.CompressToJsonBytes("Message sent to Kafka")
+	return utils.CompressToJsonBytes("Message added through Kafka")
+}
+
+func addMessage(res http.ResponseWriter, req *http.Request, params martini.Params) []byte {
+	decoder := json.NewDecoder(req.Body)
+
+	var dto dtos.MessageInputDTO
+	err := decoder.Decode(&dto)
+	if err != nil {
+		panic(err)
+	}
+
+	insertStatement := fmt.Sprintf(
+		`INSERT INTO messages (body)
+		VALUES ("%v")`, dto.Body)
+
+	_, err = db.ExecContext(context.Background(), insertStatement)
+	if err != nil {
+		log.Println(err)
+	}
+
+
+	return utils.CompressToJsonBytes("Message added directly to database")
 }
 
 func handleRequests() {
@@ -114,7 +133,8 @@ func handleRequests() {
 
 	m.Get("/messages/random", queryRandomMessage)
 	m.Get("/messages/all", queryAllMessage)
-	m.Post("/messages/add", insertMessage)
+	m.Post("/messages/add", addMessageKafka)
+	m.Post("/messages/add-direct", addMessage)
 	m.Run()
 }
 
