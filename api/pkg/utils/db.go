@@ -9,7 +9,7 @@ func CreateDatabaseIfNotExist(dbName string) {
 
 	log.Printf("Creating database '%v' if not exists.", dbName)
 
-	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/message_db")
+	db, err := sql.Open("mysql", "root:root@tcp(mysql:3306)/message_db")
 	if err != nil {
 		panic(err)
 	}

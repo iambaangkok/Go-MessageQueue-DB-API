@@ -3,7 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"log"
-	"main/api/models"
+	"models"
 )
 
 func CompressToJsonBytes(obj any) []byte {

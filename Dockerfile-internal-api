@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:1
+
+FROM golang:1.21.6-alpine
+
+# Set destination for COPY
+WORKDIR /app
+
+# Download Go modules
+COPY ./ ./
+RUN ls
+
+RUN cd ./api/src/github.com/iambaangkok && go mod download
+RUN ls
+
+# Build
+RUN cd ./api/src/github.com/iambaangkok/internal-api && CGO_ENABLED=0 GOOS=linux go build -o ../../../../../main
+RUN ls
+RUN cd ./api/src/github.com/iambaangkok/internal-api && ls
+
+EXPOSE 3000
+
+# Run
+CMD ["./main"]

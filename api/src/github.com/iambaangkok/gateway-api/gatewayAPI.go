@@ -1,4 +1,4 @@
-package gatewayAPI
+package main
 
 import (
 	"config"
@@ -59,7 +59,7 @@ func queryMessageById(id int64) models.Message {
 	return msg
 }
 
-func queryAllMessage(res http.ResponseWriter, req *http.Request, params martini.Params) []byte {
+func queryAllMessages(res http.ResponseWriter, req *http.Request, params martini.Params) []byte {
 
 	rows, err := db.Query(
 	`SELECT *
@@ -68,7 +68,7 @@ func queryAllMessage(res http.ResponseWriter, req *http.Request, params martini.
 
 	if err != nil && err != sql.ErrNoRows {
 		log.Println(err)
-	  }
+	}
 	
 	defer rows.Close()
 
@@ -83,6 +83,20 @@ func queryAllMessage(res http.ResponseWriter, req *http.Request, params martini.
 	}
 
 	return utils.CompressToJsonBytes(messages)
+}
+
+func deleteAllMessages(res http.ResponseWriter, req *http.Request, params martini.Params) []byte {
+
+	_, err := db.Query(
+	`DELETE
+	FROM messages
+	`)
+
+	if err != nil && err != sql.ErrNoRows {
+		log.Println(err)
+	}
+	
+	return utils.CompressToJsonBytes("Deleted all messages.")
 }
 
 
@@ -132,9 +146,10 @@ func handleRequests() {
 	m := martini.Classic()
 
 	m.Get("/messages/random", queryRandomMessage)
-	m.Get("/messages/all", queryAllMessage)
+	m.Get("/messages/all", queryAllMessages)
 	m.Post("/messages/add", addMessageKafka)
 	m.Post("/messages/add-direct", addMessage)
+	m.Delete("/messages/delete/all", deleteAllMessages)
 	m.Run()
 }
 
@@ -142,7 +157,7 @@ func main() {
 	/// Init
 	// Init Kafka
 	cfg := config.KafkaConnCfg {
-		Url:   "localhost:9092",
+		Url:   "kafka:9092",
 		Topic: "message.topic",
 	}
 	conn = utils.KafkaConn(cfg)
@@ -155,7 +170,7 @@ func main() {
 	utils.CreateDatabaseIfNotExist("message_db")
 	// Open DB Connection
 	var err error
-	db, err = sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/message_db")
+	db, err = sql.Open("mysql", "root:root@tcp(mysql:3306)/message_db")
 
 	if err != nil {
 		log.Fatal("Failed to open connection to MySQL")

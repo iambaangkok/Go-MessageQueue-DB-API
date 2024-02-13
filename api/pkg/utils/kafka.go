@@ -1,14 +1,12 @@
 package utils
 
 import (
+	"config"
 	"context"
+	"dtos"
 	"encoding/json"
 	"log"
-	"main/api/config"
-	"main/api/dtos"
 	"time"
-
-	// "github.com/Rayato159/go-simple-kafka/config"
 
 	"github.com/segmentio/kafka-go"
 )

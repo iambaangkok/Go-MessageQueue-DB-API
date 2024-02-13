@@ -1,4 +1,4 @@
-package internalAPI
+package main
 
 import (
 	"config"
@@ -48,7 +48,7 @@ func main() {
 	/// Init
 	// Init Kafka
 	cfg := config.KafkaConnCfg {
-		Url:   "localhost:9092",
+		Url:   "kafka:9092",
 		Topic: "message.topic",
 	}
 	conn := utils.KafkaConn(cfg)
@@ -60,7 +60,7 @@ func main() {
 	utils.CreateDatabaseIfNotExist("message_db")
 	// Open DB Connection
 	var err error
-	db, err = sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/message_db")
+	db, err = sql.Open("mysql", "root:root@tcp(mysql:3306)/message_db")
 
 	if err != nil {
 		log.Fatal("Failed to open connection to MySQL")
