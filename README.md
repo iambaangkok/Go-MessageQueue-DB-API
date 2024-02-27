@@ -25,3 +25,6 @@ docker push iambaangkok/go-kafka-internal-api:latest
 docker compose down
 docker compose up -d
 ```
+
+# Presentaion Slides
+https://docs.google.com/presentation/d/1BP5vfeZNJPy1zRIon3dRVjPaCpdui4-M6QJM9CAhTn0/edit?usp=sharing
