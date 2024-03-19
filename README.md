@@ -1,4 +1,4 @@
-# Cloud-Course-Docker-Project
+# Go-MessageQueue-DB-API
 A minimal high-performance containerized microservice API built using Go, Kafka, and MySQL.
 
 
